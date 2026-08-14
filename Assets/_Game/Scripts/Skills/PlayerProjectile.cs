@@ -50,6 +50,7 @@ public class PlayerProjectile : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
+
         if (!isLaunched)
             return;
 
