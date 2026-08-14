@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour {
 
     private CharacterController characterController;
     private float verticalSpeed;
+    private bool isInputEnabled = true;
 
     private void Awake()
     {
@@ -27,9 +28,11 @@ public class PlayerMovement : MonoBehaviour {
         if (moveJoystick == null || cameraTransform == null || playerStats == null)
             return;
 
-        MovementInput = Vector2.ClampMagnitude(
-            new Vector2(moveJoystick.Horizontal, moveJoystick.Vertical),
-            1f);
+        MovementInput = isInputEnabled
+       ? Vector2.ClampMagnitude(
+           new Vector2(moveJoystick.Horizontal, moveJoystick.Vertical),
+           1f)
+       : Vector2.zero;
 
         Vector3 cameraForward =
             Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
@@ -61,5 +64,13 @@ public class PlayerMovement : MonoBehaviour {
             Vector3.up * verticalSpeed;
 
         characterController.Move(velocity * Time.deltaTime);
+    }
+
+    public void SetInputEnabled(bool value)
+    {
+        isInputEnabled = value;
+
+        if (!isInputEnabled)
+            MovementInput = Vector2.zero;
     }
 }
