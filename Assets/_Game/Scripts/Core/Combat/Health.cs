@@ -1,0 +1,43 @@
+using System;
+using UnityEngine;
+
+public class Health : MonoBehaviour, IDamageable {
+    public float MaxHealth { get; private set; }
+    public float CurrentHealth { get; private set; }
+    public float Armor { get; private set; }
+    public bool IsDead { get; private set; }
+
+    public event Action<float, float> HealthChanged;
+    public event Action Died;
+
+    public void Initialize(float maxHealth, float armor)
+    {
+        MaxHealth = Mathf.Max(0f, maxHealth);
+        CurrentHealth = MaxHealth;
+        Armor = Mathf.Max(0f, armor);
+        IsDead = CurrentHealth <= 0f;
+
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    }
+
+    public void TakeDamage(float baseDamage)
+    {
+        if (IsDead || baseDamage <= 0f)
+            return;
+
+        float finalDamage = Mathf.Max(0f, baseDamage - Armor);
+
+        if (finalDamage <= 0f)
+            return;
+
+        CurrentHealth = Mathf.Max(0f, CurrentHealth - finalDamage);
+
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+
+        if (CurrentHealth <= 0f)
+        {
+            IsDead = true;
+            Died?.Invoke();
+        }
+    }
+}
