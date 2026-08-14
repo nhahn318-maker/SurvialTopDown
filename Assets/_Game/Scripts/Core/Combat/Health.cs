@@ -25,7 +25,7 @@ public class Health : MonoBehaviour, IDamageable {
         if (IsDead || baseDamage <= 0f)
             return;
 
-        float finalDamage = Mathf.Max(0f, baseDamage - Armor);
+        float finalDamage = DamageCalculator.CalculateDamageTaken(baseDamage, Armor);
 
         if (finalDamage <= 0f)
             return;
