@@ -8,6 +8,7 @@ using UnityEditor;
 public class MeleeEnemyBrain : MonoBehaviour {
     [SerializeField] private MeleeEnemyStats enemyStats;
     [SerializeField] private Transform target;
+    [SerializeField] private EnemyAnimationController animationController;
 
     private CharacterController characterController;
     private float recoveryEndTime;
@@ -41,10 +42,15 @@ public class MeleeEnemyBrain : MonoBehaviour {
     private void Update()
     {
         if (target == null || enemyStats == null)
+        {
+            animationController?.SetMovementSpeed(0f);
             return;
+        }
 
         if (isRecovering)
         {
+            animationController?.SetMovementSpeed(0f);
+
             if (Time.time >= recoveryEndTime)
                 isRecovering = false;
 
@@ -62,6 +68,7 @@ public class MeleeEnemyBrain : MonoBehaviour {
             return;
         }
 
+        animationController?.SetMovementSpeed(0f);
         TryAttack(directionToTarget);
     }
 
@@ -83,6 +90,8 @@ public class MeleeEnemyBrain : MonoBehaviour {
             moveDirection *
             enemyStats.MoveSpeed *
             Time.deltaTime);
+
+        animationController?.SetMovementSpeed(enemyStats.MoveSpeed);
     }
 
     private void TryAttack(Vector3 directionToTarget)
@@ -109,6 +118,7 @@ public class MeleeEnemyBrain : MonoBehaviour {
         if (damageable == null)
             return;
 
+        animationController?.TriggerAttack();
         damageable.TakeDamage(enemyStats.AttackBaseDamage);
 
         isRecovering = true;
