@@ -5,49 +5,50 @@ using UnityEditor;
 #endif
 
 [RequireComponent(typeof(CharacterController))]
-public class MeleeEnemyBrain : MonoBehaviour {
-    [SerializeField] private MeleeEnemyStats enemyStats;
+public class RangedEnemyBrain : MonoBehaviour {
+    [SerializeField] private RangedEnemyStats enemyStats;
     [SerializeField] private Transform target;
+    [SerializeField] private Transform projectileLaunchPoint;
+    [SerializeField] private RangedProjectilePool projectilePool;
 
     private CharacterController characterController;
-    private float recoveryEndTime;
-    private bool isRecovering;
+    private float nextAttackTime;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
 
-        if (enemyStats == null)
+        if (enemyStats == null ||
+            projectileLaunchPoint == null ||
+            projectilePool == null)
         {
-            Debug.LogError("MeleeEnemyBrain requires MeleeEnemyStats.", this);
+            Debug.LogError(
+                "RangedEnemyBrain requires stats, launch point, and projectile pool.",
+                this);
+
             enabled = false;
         }
     }
 
     private void OnEnable()
     {
-        recoveryEndTime = 0f;
-        isRecovering = false;
+        nextAttackTime = 0f;
 
         if (target == null)
         {
             PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
 
             if (playerHealth != null)
+            {
                 target = playerHealth.transform;
+            }
         }
     }
 
     private void Update()
     {
         if (target == null || enemyStats == null)
-            return;
-
-        if (isRecovering)
         {
-            if (Time.time >= recoveryEndTime)
-                isRecovering = false;
-
             return;
         }
 
@@ -56,7 +57,7 @@ public class MeleeEnemyBrain : MonoBehaviour {
 
         float targetDistance = directionToTarget.magnitude;
 
-        if (targetDistance > enemyStats.AttackRange)
+        if (targetDistance > enemyStats.PreferredDistance)
         {
             Chase(directionToTarget);
             return;
@@ -73,7 +74,9 @@ public class MeleeEnemyBrain : MonoBehaviour {
     private void Chase(Vector3 directionToTarget)
     {
         if (directionToTarget.sqrMagnitude <= Mathf.Epsilon)
+        {
             return;
+        }
 
         Vector3 moveDirection = directionToTarget.normalized;
 
@@ -87,32 +90,33 @@ public class MeleeEnemyBrain : MonoBehaviour {
 
     private void TryAttack(Vector3 directionToTarget)
     {
-        if (directionToTarget.sqrMagnitude <= Mathf.Epsilon)
+        if (Time.time < nextAttackTime ||
+            directionToTarget.sqrMagnitude <= Mathf.Epsilon)
+        {
             return;
+        }
 
         Vector3 attackDirection = directionToTarget.normalized;
 
         transform.rotation = Quaternion.LookRotation(attackDirection);
 
-        float angleToTarget = Vector3.Angle(
-            transform.forward,
-            attackDirection);
+        GameObject projectileObject = projectilePool.Get(
+            projectileLaunchPoint.position,
+            Quaternion.LookRotation(attackDirection));
 
-        float halfConeAngle = enemyStats.AttackConeAngle * 0.5f;
+        RangedEnemyProjectile projectile =
+            projectileObject.GetComponent<RangedEnemyProjectile>();
 
-        if (angleToTarget > halfConeAngle)
-            return;
+        projectile.Launch(
+            projectilePool,
+            attackDirection,
+            enemyStats.ProjectileSpeed,
+            enemyStats.ProjectileRange,
+            enemyStats.PoisonDamagePerTick,
+            enemyStats.PoisonTickCount,
+            enemyStats.PoisonDuration);
 
-        IDamageable damageable =
-            target.GetComponent<IDamageable>();
-
-        if (damageable == null)
-            return;
-
-        damageable.TakeDamage(enemyStats.AttackBaseDamage);
-
-        isRecovering = true;
-        recoveryEndTime = Time.time + enemyStats.RecoverySeconds;
+        nextAttackTime = Time.time + enemyStats.AttackCooldown;
     }
 
 #if UNITY_EDITOR
@@ -121,40 +125,19 @@ public class MeleeEnemyBrain : MonoBehaviour {
         if (enemyStats == null)
             return;
 
-        Vector3 origin = transform.position + Vector3.up * 0.1f;
-        float halfConeAngle = enemyStats.AttackConeAngle * 0.5f;
-
-        Vector3 leftDirection =
-            Quaternion.Euler(0f, -halfConeAngle, 0f) * transform.forward;
-
-        Vector3 rightDirection =
-            Quaternion.Euler(0f, halfConeAngle, 0f) * transform.forward;
-
         Handles.color = new Color(1f, 0f, 0f, 0.18f);
 
-        Handles.DrawSolidArc(
-            origin,
+        Handles.DrawSolidDisc(
+            transform.position,
             Vector3.up,
-            leftDirection,
-            enemyStats.AttackConeAngle,
-            enemyStats.AttackRange);
+            enemyStats.PreferredDistance);
 
         Handles.color = Color.red;
 
-        Handles.DrawWireArc(
-            origin,
+        Handles.DrawWireDisc(
+            transform.position,
             Vector3.up,
-            leftDirection,
-            enemyStats.AttackConeAngle,
-            enemyStats.AttackRange);
-
-        Handles.DrawLine(
-            origin,
-            origin + leftDirection * enemyStats.AttackRange);
-
-        Handles.DrawLine(
-            origin,
-            origin + rightDirection * enemyStats.AttackRange);
+            enemyStats.PreferredDistance);
     }
 #endif
 }
