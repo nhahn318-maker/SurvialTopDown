@@ -12,11 +12,14 @@ public class RangedEnemyBrain : MonoBehaviour {
     [SerializeField] private RangedProjectilePool projectilePool;
 
     private CharacterController characterController;
+    private EnemyAnimationController animationController;
     private float nextAttackTime;
 
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        animationController =
+            GetComponentInChildren<EnemyAnimationController>(true);
 
         if (enemyStats == null || projectileLaunchPoint == null)
         {
@@ -62,6 +65,7 @@ public class RangedEnemyBrain : MonoBehaviour {
             enemyStats == null ||
             projectilePool == null)
         {
+            animationController?.SetMovementSpeed(0f);
             return;
         }
 
@@ -76,6 +80,7 @@ public class RangedEnemyBrain : MonoBehaviour {
             return;
         }
 
+        animationController?.SetMovementSpeed(0f);
         TryAttack(directionToTarget);
     }
 
@@ -99,6 +104,8 @@ public class RangedEnemyBrain : MonoBehaviour {
             moveDirection *
             enemyStats.MoveSpeed *
             Time.deltaTime);
+
+        animationController?.SetMovementSpeed(enemyStats.MoveSpeed);
     }
 
     private void TryAttack(Vector3 directionToTarget)
@@ -129,6 +136,7 @@ public class RangedEnemyBrain : MonoBehaviour {
             enemyStats.PoisonTickCount,
             enemyStats.PoisonDuration);
 
+        animationController?.TriggerShoot();
         nextAttackTime = Time.time + enemyStats.AttackCooldown;
     }
 

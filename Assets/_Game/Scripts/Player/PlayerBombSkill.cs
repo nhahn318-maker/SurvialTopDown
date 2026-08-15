@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerBombSkill : MonoBehaviour {
@@ -8,6 +9,8 @@ public class PlayerBombSkill : MonoBehaviour {
 
     public float RemainingCooldown =>
         Mathf.Max(0f, nextAvailableTime - Time.time);
+
+    public event Action BombPlaced;
 
     private float nextAvailableTime;
 
@@ -26,6 +29,7 @@ public class PlayerBombSkill : MonoBehaviour {
 
         Bomb bomb = bombObject.GetComponent<Bomb>();
         bomb.Activate(bombPool, finalDamage);
+        BombPlaced?.Invoke();
 
         nextAvailableTime = Time.time + bombStats.CooldownSeconds;
     }

@@ -12,6 +12,7 @@ public class PlayerBasicAttack : MonoBehaviour {
 
     public event Action<int, int> ChargesChanged;
     public event Action<float> ProjectileRequested;
+    public event Action Fired;
 
     private float nextFireTime;
     private float nextChargeRecoveryTime;
@@ -64,6 +65,7 @@ public class PlayerBasicAttack : MonoBehaviour {
         }
 
         ChargesChanged?.Invoke(CurrentCharges, MaxCharges);
+        Fired?.Invoke();
 
         foreach (float angle in basicAttackStats.SpreadAngles)
         {

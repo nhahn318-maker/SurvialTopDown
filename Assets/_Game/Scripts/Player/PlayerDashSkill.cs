@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,8 @@ public class PlayerDashSkill : MonoBehaviour {
 
     public float RemainingCooldown =>
         Mathf.Max(0f, nextAvailableTime - Time.time);
+
+    public event Action DashStarted;
 
     private CharacterController characterController;
     private Collider[] overlapBuffer;
@@ -46,6 +49,7 @@ public class PlayerDashSkill : MonoBehaviour {
         }
 
         nextAvailableTime = Time.time + dashStats.CooldownSeconds;
+        DashStarted?.Invoke();
         dashCoroutine = StartCoroutine(Dash());
     }
 

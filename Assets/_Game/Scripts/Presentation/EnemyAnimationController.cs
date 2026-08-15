@@ -6,6 +6,7 @@ public class EnemyAnimationController : MonoBehaviour
 
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int ShootHash = Animator.StringToHash("Shoot");
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DieHash = Animator.StringToHash("Die");
 
@@ -44,6 +45,12 @@ public class EnemyAnimationController : MonoBehaviour
     {
         if (animator != null)
             animator.SetTrigger(AttackHash);
+    }
+
+    public void TriggerShoot()
+    {
+        if (animator != null)
+            animator.SetTrigger(ShootHash);
     }
 
     public void TriggerDeath()
