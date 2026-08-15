@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WaveManager : MonoBehaviour {
@@ -47,9 +48,6 @@ public class WaveManager : MonoBehaviour {
 
     private void SpawnNextWave()
     {
-        currentWave++;
-        hasActiveWave = true;
-
         int meleeCount = Random.Range(
             waveConfig.MinMeleeCount,
             waveConfig.MaxMeleeCount + 1);
@@ -58,16 +56,50 @@ public class WaveManager : MonoBehaviour {
             waveConfig.MinRangedCount,
             waveConfig.MaxRangedCount + 1);
 
-        SpawnEnemies(meleeEnemyPool, meleeCount);
-        SpawnEnemies(rangedEnemyPool, rangedCount);
+        int totalEnemyCount = meleeCount + rangedCount;
+
+        if (totalEnemyCount > spawnPoints.Length)
+        {
+            Debug.LogError(
+                "WaveManager requires at least one spawn point per enemy.",
+                this);
+
+            hasActiveWave = false;
+            return;
+        }
+
+        currentWave++;
+        hasActiveWave = true;
+
+        List<Transform> availableSpawnPoints =
+            new List<Transform>(spawnPoints);
+
+        SpawnEnemies(
+            meleeEnemyPool,
+            meleeCount,
+            availableSpawnPoints);
+
+        SpawnEnemies(
+            rangedEnemyPool,
+            rangedCount,
+            availableSpawnPoints);
     }
 
-    private void SpawnEnemies(EnemyPool enemyPool, int count)
+    private static void SpawnEnemies(
+        EnemyPool enemyPool,
+        int count,
+        List<Transform> availableSpawnPoints)
     {
         for (int index = 0; index < count; index++)
         {
+            int spawnPointIndex = Random.Range(
+                0,
+                availableSpawnPoints.Count);
+
             Transform spawnPoint =
-                spawnPoints[Random.Range(0, spawnPoints.Length)];
+                availableSpawnPoints[spawnPointIndex];
+
+            availableSpawnPoints.RemoveAt(spawnPointIndex);
 
             enemyPool.Get(
                 spawnPoint.position,
