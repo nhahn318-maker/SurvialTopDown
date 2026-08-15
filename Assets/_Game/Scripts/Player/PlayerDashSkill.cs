@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerDashSkill : MonoBehaviour {
     [SerializeField] private PlayerMovement playerMovement;
-    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private DashStats dashStats;
     [SerializeField] private LayerMask enemyLayers;
     [SerializeField, Min(1)] private int maxHitColliders;
@@ -82,7 +82,7 @@ public class PlayerDashSkill : MonoBehaviour {
     {
         float finalDamage = DamageCalculator.CalculateDamageDealt(
             dashStats.ExplosionBaseDamage,
-            playerStats.DamageMultiplier);
+            playerProgression.DamageMultiplier);
 
         int hitCount = Physics.OverlapSphereNonAlloc(
             transform.position,

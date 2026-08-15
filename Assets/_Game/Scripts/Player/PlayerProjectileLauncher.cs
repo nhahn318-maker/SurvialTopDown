@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class PlayerProjectileLauncher : MonoBehaviour {
     [SerializeField] private PlayerBasicAttack basicAttack;
-    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private ProjectilePool projectilePool;
     [SerializeField] private Transform launchPoint;
 
     private void Awake()
     {
         if (basicAttack == null ||
-            playerStats == null ||
+            playerProgression == null ||
             projectilePool == null ||
             launchPoint == null)
         {
@@ -39,7 +39,7 @@ public class PlayerProjectileLauncher : MonoBehaviour {
 
         float finalDamage = DamageCalculator.CalculateDamageDealt(
             basicAttack.ProjectileBaseDamage,
-            playerStats.DamageMultiplier);
+            playerProgression.DamageMultiplier);
 
         GameObject projectileObject = projectilePool.Get(
             launchPoint.position,

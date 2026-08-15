@@ -40,4 +40,40 @@ public class Health : MonoBehaviour, IDamageable {
             Died?.Invoke();
         }
     }
+
+    public void AddMaxHealth(float amount)
+    {
+        if (amount <= 0f)
+        {
+            return;
+        }
+
+        MaxHealth += amount;
+
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    }
+
+    public void RestoreHealth(float amount)
+    {
+        if (IsDead || amount <= 0f)
+        {
+            return;
+        }
+
+        CurrentHealth = Mathf.Min(
+            MaxHealth,
+            CurrentHealth + amount);
+
+        HealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    }
+
+    public void AddArmor(float amount)
+    {
+        if (amount <= 0f)
+        {
+            return;
+        }
+
+        Armor += amount;
+    }
 }

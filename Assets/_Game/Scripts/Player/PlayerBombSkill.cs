@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class PlayerBombSkill : MonoBehaviour {
-    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private BombStats bombStats;
     [SerializeField] private BombPool bombPool;
     [SerializeField] private Transform bombPlacementPoint;
@@ -18,7 +18,7 @@ public class PlayerBombSkill : MonoBehaviour {
 
         float finalDamage = DamageCalculator.CalculateDamageDealt(
             bombStats.BaseDamage,
-            playerStats.DamageMultiplier);
+            playerProgression.DamageMultiplier);
 
         GameObject bombObject = bombPool.Get(
             bombPlacementPoint.position,

@@ -121,5 +121,5 @@ MonoBehaviour:
   bombStats: {fileID: 11400000, guid: 1e1418d03361bd44fa17509bdc4480ea, type: 2}
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   maxHitColliders: 32
