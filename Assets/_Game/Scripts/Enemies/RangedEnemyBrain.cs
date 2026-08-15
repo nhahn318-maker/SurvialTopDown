@@ -18,12 +18,10 @@ public class RangedEnemyBrain : MonoBehaviour {
     {
         characterController = GetComponent<CharacterController>();
 
-        if (enemyStats == null ||
-            projectileLaunchPoint == null ||
-            projectilePool == null)
+        if (enemyStats == null || projectileLaunchPoint == null)
         {
             Debug.LogError(
-                "RangedEnemyBrain requires stats, launch point, and projectile pool.",
+                "RangedEnemyBrain requires stats and launch point.",
                 this);
 
             enabled = false;
@@ -33,6 +31,19 @@ public class RangedEnemyBrain : MonoBehaviour {
     private void OnEnable()
     {
         nextAttackTime = 0f;
+
+        if (projectilePool == null)
+        {
+            projectilePool = FindObjectOfType<RangedProjectilePool>();
+
+            if (projectilePool == null)
+            {
+                Debug.LogError(
+                    "RangedEnemyBrain requires RangedProjectilePool.",
+                    this);
+                return;
+            }
+        }
 
         if (target == null)
         {
@@ -47,7 +58,9 @@ public class RangedEnemyBrain : MonoBehaviour {
 
     private void Update()
     {
-        if (target == null || enemyStats == null)
+        if (target == null ||
+            enemyStats == null ||
+            projectilePool == null)
         {
             return;
         }
