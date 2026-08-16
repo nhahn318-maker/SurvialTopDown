@@ -131,9 +131,9 @@ public class PlayerAnimationController : MonoBehaviour {
         animator.SetTrigger(BombHash);
     }
 
-    private void TriggerHit(float damage)
+    private void TriggerHit(float damage, bool playHitAnimation)
     {
-        if (!isDead)
+        if (!isDead && playHitAnimation)
             animator.SetTrigger(HitHash);
     }
 

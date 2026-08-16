@@ -8,7 +8,7 @@ public class Health : MonoBehaviour, IDamageable {
     public bool IsDead { get; private set; }
 
     public event Action<float, float> HealthChanged;
-    public event Action<float> Damaged;
+    public event Action<float, bool> Damaged;
     public event Action Died;
 
     public void Initialize(float maxHealth, float armor)
@@ -23,6 +23,11 @@ public class Health : MonoBehaviour, IDamageable {
 
     public void TakeDamage(float baseDamage)
     {
+        TakeDamage(baseDamage, true);
+    }
+
+    public void TakeDamage(float baseDamage, bool playHitAnimation)
+    {
         if (IsDead || baseDamage <= 0f)
             return;
 
@@ -33,7 +38,7 @@ public class Health : MonoBehaviour, IDamageable {
 
         CurrentHealth = Mathf.Max(0f, CurrentHealth - finalDamage);
 
-        Damaged?.Invoke(finalDamage);
+        Damaged?.Invoke(finalDamage, playHitAnimation);
         HealthChanged?.Invoke(CurrentHealth, MaxHealth);
 
         if (CurrentHealth <= 0f)

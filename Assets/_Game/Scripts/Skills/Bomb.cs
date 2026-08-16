@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class Bomb : MonoBehaviour {
     [SerializeField] private BombStats bombStats;
     [SerializeField] private LayerMask enemyLayers;
@@ -11,6 +15,7 @@ public class Bomb : MonoBehaviour {
     private readonly HashSet<IDamageable> damagedTargets = new();
 
     private BombPool ownerPool;
+    private VfxPool explosionVfxPool;
     private float explosionDamage;
     private Coroutine detonationCoroutine;
 
@@ -28,9 +33,13 @@ public class Bomb : MonoBehaviour {
         }
     }
 
-    public void Activate(BombPool pool, float finalDamage)
+    public void Activate(
+        BombPool pool,
+        VfxPool vfxPool,
+        float finalDamage)
     {
         ownerPool = pool;
+        explosionVfxPool = vfxPool;
         explosionDamage = finalDamage;
 
         detonationCoroutine = StartCoroutine(DetonateAfterDelay());
@@ -60,6 +69,31 @@ public class Bomb : MonoBehaviour {
             }
         }
 
+        if (explosionVfxPool != null)
+            explosionVfxPool.Play(transform.position, Quaternion.identity);
+
         ownerPool.Release(gameObject);
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        if (bombStats == null)
+            return;
+
+        Vector3 origin = transform.position + Vector3.up * 0.03f;
+
+        Handles.color = new Color(0f, 0.7f, 1f, 0.18f);
+        Handles.DrawSolidDisc(
+            origin,
+            Vector3.up,
+            bombStats.ExplosionRadius);
+
+        Handles.color = new Color(0f, 0.8f, 1f, 1f);
+        Handles.DrawWireDisc(
+            origin,
+            Vector3.up,
+            bombStats.ExplosionRadius);
+    }
+#endif
 }

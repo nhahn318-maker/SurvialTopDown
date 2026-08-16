@@ -5,6 +5,7 @@ public class PlayerBombSkill : MonoBehaviour {
     [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private BombStats bombStats;
     [SerializeField] private BombPool bombPool;
+    [SerializeField] private VfxPool explosionVfxPool;
     [SerializeField] private Transform bombPlacementPoint;
 
     public float RemainingCooldown =>
@@ -28,7 +29,7 @@ public class PlayerBombSkill : MonoBehaviour {
             Quaternion.identity);
 
         Bomb bomb = bombObject.GetComponent<Bomb>();
-        bomb.Activate(bombPool, finalDamage);
+        bomb.Activate(bombPool, explosionVfxPool, finalDamage);
         BombPlaced?.Invoke();
 
         nextAvailableTime = Time.time + bombStats.CooldownSeconds;

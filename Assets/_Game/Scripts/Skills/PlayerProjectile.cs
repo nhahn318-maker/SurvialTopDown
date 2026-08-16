@@ -7,6 +7,7 @@ public class PlayerProjectile : MonoBehaviour {
 
     private Rigidbody projectileRigidbody;
     private ProjectilePool ownerPool;
+    private VfxPool impactVfxPool;
     private Vector3 direction;
     private float travelledDistance;
     private float damage;
@@ -39,9 +40,11 @@ public class PlayerProjectile : MonoBehaviour {
     public void Launch(
         ProjectilePool pool,
         Vector3 launchDirection,
-        float projectileDamage)
+        float projectileDamage,
+        VfxPool impactPool)
     {
         ownerPool = pool;
+        impactVfxPool = impactPool;
         direction = launchDirection.normalized;
         damage = projectileDamage;
         travelledDistance = 0f;
@@ -66,6 +69,7 @@ public class PlayerProjectile : MonoBehaviour {
             return;
 
         damageable.TakeDamage(damage);
+        impactVfxPool?.Play(other.ClosestPoint(transform.position), Quaternion.identity);
         ReleaseToPool();
     }
 

@@ -31,7 +31,7 @@ public class PoisonEffect : MonoBehaviour {
 
         for (int tickIndex = 0; tickIndex < tickCount; tickIndex++)
         {
-            health.TakeDamage(damagePerTick);
+            health.TakeDamage(damagePerTick, false);
 
             if (tickIndex < tickCount - 1)
             {

@@ -59,8 +59,9 @@ public class EnemyAnimationController : MonoBehaviour
             animator.SetTrigger(DieHash);
     }
 
-    private void HandleDamaged(float damage)
+    private void HandleDamaged(float damage, bool playHitAnimation)
     {
-        animator.SetTrigger(HitHash);
+        if (playHitAnimation)
+            animator.SetTrigger(HitHash);
     }
 }

@@ -4,6 +4,7 @@ public class PlayerProjectileLauncher : MonoBehaviour {
     [SerializeField] private PlayerBasicAttack basicAttack;
     [SerializeField] private PlayerProgression playerProgression;
     [SerializeField] private ProjectilePool projectilePool;
+    [SerializeField] private VfxPool impactVfxPool;
     [SerializeField] private Transform launchPoint;
 
     private void Awake()
@@ -11,6 +12,7 @@ public class PlayerProjectileLauncher : MonoBehaviour {
         if (basicAttack == null ||
             playerProgression == null ||
             projectilePool == null ||
+            impactVfxPool == null ||
             launchPoint == null)
         {
             Debug.LogError(
@@ -51,6 +53,7 @@ public class PlayerProjectileLauncher : MonoBehaviour {
         projectile.Launch(
             projectilePool,
             direction,
-            finalDamage);
+            finalDamage,
+            impactVfxPool);
     }
 }
