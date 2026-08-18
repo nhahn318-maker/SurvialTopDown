@@ -7,6 +7,7 @@ public class PoisonEffect : MonoBehaviour {
     [SerializeField] private VfxPool poisonVfxPool;
     [SerializeField] private Transform poisonVfxPoint;
 
+    public event Action PoisonApplied;
     public event Action PoisonDamageApplied;
 
     private Health health;
@@ -19,6 +20,8 @@ public class PoisonEffect : MonoBehaviour {
 
     public void Apply(float damagePerTick, int tickCount, float duration)
     {
+        PoisonApplied?.Invoke();
+
         if (poisonRoutine != null)
         {
             StopCoroutine(poisonRoutine);

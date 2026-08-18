@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class WaveManager : MonoBehaviour {
     [SerializeField] private WaveConfig waveConfig;
@@ -9,8 +11,10 @@ public class WaveManager : MonoBehaviour {
 
     private int currentWave;
     private bool hasActiveWave;
+    private Coroutine spawnWaveCoroutine;
 
     public int CurrentWave => currentWave;
+    public event Action<int> WaveStarted;
 
     private void Awake()
     {
@@ -27,12 +31,12 @@ public class WaveManager : MonoBehaviour {
 
     private void Start()
     {
-        SpawnNextWave();
+        BeginNextWave();
     }
 
     private void Update()
     {
-        if (!hasActiveWave)
+        if (!hasActiveWave || spawnWaveCoroutine != null)
         {
             return;
         }
@@ -43,10 +47,27 @@ public class WaveManager : MonoBehaviour {
             return;
         }
 
-        SpawnNextWave();
+        BeginNextWave();
     }
 
-    private void SpawnNextWave()
+    private void OnDisable()
+    {
+        if (spawnWaveCoroutine != null)
+        {
+            StopCoroutine(spawnWaveCoroutine);
+            spawnWaveCoroutine = null;
+        }
+    }
+
+    private void BeginNextWave()
+    {
+        if (spawnWaveCoroutine == null)
+        {
+            spawnWaveCoroutine = StartCoroutine(SpawnNextWave());
+        }
+    }
+
+    private System.Collections.IEnumerator SpawnNextWave()
     {
         int meleeCount = Random.Range(
             waveConfig.MinMeleeCount,
@@ -65,45 +86,81 @@ public class WaveManager : MonoBehaviour {
                 this);
 
             hasActiveWave = false;
-            return;
+            spawnWaveCoroutine = null;
+            yield break;
         }
 
         currentWave++;
         hasActiveWave = true;
+        WaveStarted?.Invoke(currentWave);
 
         List<Transform> availableSpawnPoints =
             new List<Transform>(spawnPoints);
 
-        SpawnEnemies(
-            meleeEnemyPool,
+        List<EnemyPool> spawnPlan = CreateSpawnPlan(
             meleeCount,
-            availableSpawnPoints);
+            rangedCount);
 
-        SpawnEnemies(
-            rangedEnemyPool,
-            rangedCount,
-            availableSpawnPoints);
+        for (int index = 0; index < spawnPlan.Count; index++)
+        {
+            SpawnEnemy(spawnPlan[index], availableSpawnPoints);
+
+            if (index < spawnPlan.Count - 1 &&
+                waveConfig.SpawnIntervalSeconds > 0f)
+            {
+                yield return new WaitForSeconds(
+                    waveConfig.SpawnIntervalSeconds);
+            }
+        }
+
+        spawnWaveCoroutine = null;
     }
 
-    private static void SpawnEnemies(
+    private List<EnemyPool> CreateSpawnPlan(
+        int meleeCount,
+        int rangedCount)
+    {
+        List<EnemyPool> spawnPlan = new List<EnemyPool>(
+            meleeCount + rangedCount);
+
+        AddEnemiesToPlan(spawnPlan, meleeEnemyPool, meleeCount);
+        AddEnemiesToPlan(spawnPlan, rangedEnemyPool, rangedCount);
+
+        for (int index = spawnPlan.Count - 1; index > 0; index--)
+        {
+            int swapIndex = Random.Range(0, index + 1);
+            (spawnPlan[index], spawnPlan[swapIndex]) =
+                (spawnPlan[swapIndex], spawnPlan[index]);
+        }
+
+        return spawnPlan;
+    }
+
+    private static void AddEnemiesToPlan(
+        List<EnemyPool> spawnPlan,
         EnemyPool enemyPool,
-        int count,
-        List<Transform> availableSpawnPoints)
+        int count)
     {
         for (int index = 0; index < count; index++)
         {
-            int spawnPointIndex = Random.Range(
-                0,
-                availableSpawnPoints.Count);
-
-            Transform spawnPoint =
-                availableSpawnPoints[spawnPointIndex];
-
-            availableSpawnPoints.RemoveAt(spawnPointIndex);
-
-            enemyPool.Get(
-                spawnPoint.position,
-                spawnPoint.rotation);
+            spawnPlan.Add(enemyPool);
         }
+    }
+
+    private static void SpawnEnemy(
+        EnemyPool enemyPool,
+        List<Transform> availableSpawnPoints)
+    {
+        int spawnPointIndex = Random.Range(
+            0,
+            availableSpawnPoints.Count);
+
+        Transform spawnPoint = availableSpawnPoints[spawnPointIndex];
+
+        availableSpawnPoints.RemoveAt(spawnPointIndex);
+
+        enemyPool.Get(
+            spawnPoint.position,
+            spawnPoint.rotation);
     }
 }

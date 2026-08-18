@@ -9,6 +9,7 @@ public class PlayerBasicAttack : MonoBehaviour {
 
     public float ProjectileBaseDamage =>
     basicAttackStats.ProjectileBaseDamage;
+    public float[] SpreadAngles => basicAttackStats.SpreadAngles;
 
     public event Action<int, int> ChargesChanged;
     public event Action<float> ProjectileRequested;

@@ -1,5 +1,88 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4572826315638334858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 73878162622051604}
+  - component: {fileID: 3655085847402887896}
+  - component: {fileID: 6924300516517863232}
+  m_Layer: 7
+  m_Name: Visual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &73878162622051604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572826315638334858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4072517842842656138}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!33 &3655085847402887896
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572826315638334858}
+  m_Mesh: {fileID: 116206407920731985, guid: cbadfe6834ed8a74d8909fa293c0559a, type: 3}
+--- !u!23 &6924300516517863232
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572826315638334858}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9327a18c30ea23142a28ece66ca19123, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6530942775705638752
 GameObject:
   m_ObjectHideFlags: 0
@@ -9,11 +92,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4072517842842656138}
-  - component: {fileID: 7706191761655894842}
   - component: {fileID: 7457589899357163560}
   - component: {fileID: 48083224349453213}
   - component: {fileID: 7484753789247534503}
-  - component: {fileID: 983789799521596925}
+  - component: {fileID: 2558094057633075225}
   m_Layer: 7
   m_Name: PlayerProjectile
   m_TagString: Untagged
@@ -30,20 +112,13 @@ Transform:
   m_GameObject: {fileID: 6530942775705638752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.42452645, y: -0.95246387, z: 0.14877987}
-  m_LocalScale: {x: 8, y: 8, z: 8}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 73878162622051604}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7706191761655894842
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6530942775705638752}
-  m_Mesh: {fileID: 116206407920731985, guid: cbadfe6834ed8a74d8909fa293c0559a, type: 3}
 --- !u!23 &7457589899357163560
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -129,8 +204,8 @@ MonoBehaviour:
   hitLayers:
     serializedVersion: 2
     m_Bits: 64
---- !u!136 &983789799521596925
-CapsuleCollider:
+--- !u!65 &2558094057633075225
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -147,8 +222,6 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.015
-  m_Height: 0.06573791
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.02470376, z: 0}
+  serializedVersion: 3
+  m_Size: {x: 0.31394055, y: 0.303218, z: 0.443816}
+  m_Center: {x: 0.0058446676, y: 0.013424426, z: 0.18482059}

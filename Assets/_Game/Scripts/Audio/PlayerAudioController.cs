@@ -11,12 +11,14 @@ public class PlayerAudioController : MonoBehaviour
 
     private AudioSource audioSource;
     private Health health;
+    private PoisonEffect poisonEffect;
     private float nextFootstepTime;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         health = GetComponent<Health>();
+        poisonEffect = GetComponent<PoisonEffect>();
 
         if (audioSettings == null || playerMovement == null ||
             basicAttack == null || bombSkill == null || dashSkill == null || health == null)
@@ -39,6 +41,9 @@ public class PlayerAudioController : MonoBehaviour
 
         if (health != null)
             health.Damaged += PlayPlayerHit;
+
+        if (poisonEffect != null)
+            poisonEffect.PoisonApplied += PlayPlayerHit;
     }
 
     private void OnDisable()
@@ -54,6 +59,9 @@ public class PlayerAudioController : MonoBehaviour
 
         if (health != null)
             health.Damaged -= PlayPlayerHit;
+
+        if (poisonEffect != null)
+            poisonEffect.PoisonApplied -= PlayPlayerHit;
     }
 
     private void Update()
@@ -85,6 +93,11 @@ public class PlayerAudioController : MonoBehaviour
     {
         if (playHitAnimation)
             Play(audioSettings.PlayerHitClip, audioSettings.PlayerHitVolume);
+    }
+
+    private void PlayPlayerHit()
+    {
+        Play(audioSettings.PlayerHitClip, audioSettings.PlayerHitVolume);
     }
 
     private void Play(AudioClip clip, float volume)

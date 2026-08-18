@@ -5,6 +5,8 @@ public class PlayerProjectile : MonoBehaviour {
     [SerializeField] private ProjectileStats projectileStats;
     [SerializeField] private LayerMask hitLayers;
 
+    public ProjectileStats Stats => projectileStats;
+
     private Rigidbody projectileRigidbody;
     private ProjectilePool ownerPool;
     private VfxPool impactVfxPool;

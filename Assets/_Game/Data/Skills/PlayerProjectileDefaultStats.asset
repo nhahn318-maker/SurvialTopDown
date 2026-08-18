@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a44bcdf53a37b7249a1bef053291787e, type: 3}
   m_Name: PlayerProjectileDefaultStats
   m_EditorClassIdentifier: 
-  moveSpeed: 12
-  maxTravelDistance: 10
+  moveSpeed: 18
+  maxTravelDistance: 18

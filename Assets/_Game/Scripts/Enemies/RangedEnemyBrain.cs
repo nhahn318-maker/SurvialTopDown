@@ -14,7 +14,9 @@ public class RangedEnemyBrain : MonoBehaviour {
     private CharacterController characterController;
     private EnemyAnimationController animationController;
     private float nextAttackTime;
+    private float recoveryEndTime;
     private bool isInAttackPosition;
+    private bool isRecovering;
 
     private void Awake()
     {
@@ -35,7 +37,9 @@ public class RangedEnemyBrain : MonoBehaviour {
     private void OnEnable()
     {
         nextAttackTime = 0f;
+        recoveryEndTime = 0f;
         isInAttackPosition = false;
+        isRecovering = false;
 
         if (projectilePool == null)
         {
@@ -68,6 +72,16 @@ public class RangedEnemyBrain : MonoBehaviour {
             projectilePool == null)
         {
             animationController?.SetMovementSpeed(0f);
+            return;
+        }
+
+        if (isRecovering)
+        {
+            animationController?.SetMovementSpeed(0f);
+
+            if (Time.time >= recoveryEndTime)
+                isRecovering = false;
+
             return;
         }
 
@@ -158,6 +172,8 @@ public class RangedEnemyBrain : MonoBehaviour {
 
         animationController?.TriggerShoot();
         nextAttackTime = Time.time + enemyStats.AttackCooldown;
+        recoveryEndTime = nextAttackTime;
+        isRecovering = true;
     }
 
 #if UNITY_EDITOR

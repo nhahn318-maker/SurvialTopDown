@@ -8,6 +8,11 @@ public class ProjectilePool : MonoBehaviour {
 
     private IObjectPool<GameObject> pool;
 
+    public ProjectileStats ProjectileStats =>
+        projectilePrefab != null
+            ? projectilePrefab.GetComponent<PlayerProjectile>()?.Stats
+            : null;
+
     private void Awake()
     {
         if (projectilePrefab == null)

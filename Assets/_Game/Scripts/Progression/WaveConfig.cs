@@ -9,8 +9,12 @@ public class WaveConfig : ScriptableObject {
     [SerializeField, Min(0)] private int minRangedCount;
     [SerializeField, Min(0)] private int maxRangedCount;
 
+    [Header("Spawn Timing")]
+    [SerializeField, Min(0f)] private float spawnIntervalSeconds;
+
     public int MinMeleeCount => minMeleeCount;
     public int MaxMeleeCount => maxMeleeCount;
     public int MinRangedCount => minRangedCount;
     public int MaxRangedCount => maxRangedCount;
+    public float SpawnIntervalSeconds => spawnIntervalSeconds;
 }
