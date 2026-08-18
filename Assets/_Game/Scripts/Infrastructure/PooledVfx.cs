@@ -8,7 +8,7 @@ public class PooledVfx : MonoBehaviour
 
     private void Awake()
     {
-        particleSystems = GetComponentsInChildren<ParticleSystem>(true);
+        RefreshParticleSystems();
 
         if (particleSystems.Length == 0)
         {
@@ -19,6 +19,7 @@ public class PooledVfx : MonoBehaviour
 
     private void OnEnable()
     {
+        RefreshParticleSystems();
         StopAndClear();
         isPlaying = false;
     }
@@ -41,10 +42,21 @@ public class PooledVfx : MonoBehaviour
     public void Play(VfxPool pool)
     {
         ownerPool = pool;
+        RefreshParticleSystems();
+
+        if (particleSystems.Length == 0)
+        {
+            ownerPool.Release(gameObject);
+            return;
+        }
+
         StopAndClear();
 
         foreach (ParticleSystem particleSystem in particleSystems)
-            particleSystem.Play(true);
+        {
+            if (particleSystem != null)
+                particleSystem.Play(true);
+        }
 
         isPlaying = true;
     }
@@ -53,7 +65,7 @@ public class PooledVfx : MonoBehaviour
     {
         foreach (ParticleSystem particleSystem in particleSystems)
         {
-            if (particleSystem.IsAlive(true))
+            if (particleSystem != null && particleSystem.IsAlive(true))
                 return true;
         }
 
@@ -67,9 +79,17 @@ public class PooledVfx : MonoBehaviour
 
         foreach (ParticleSystem particleSystem in particleSystems)
         {
-            particleSystem.Stop(
-                true,
-                ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (particleSystem != null)
+            {
+                particleSystem.Stop(
+                    true,
+                    ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
         }
+    }
+
+    private void RefreshParticleSystems()
+    {
+        particleSystems = GetComponentsInChildren<ParticleSystem>(true);
     }
 }

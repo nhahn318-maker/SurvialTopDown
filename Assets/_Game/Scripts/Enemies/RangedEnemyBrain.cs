@@ -14,6 +14,7 @@ public class RangedEnemyBrain : MonoBehaviour {
     private CharacterController characterController;
     private EnemyAnimationController animationController;
     private float nextAttackTime;
+    private bool isInAttackPosition;
 
     private void Awake()
     {
@@ -34,6 +35,7 @@ public class RangedEnemyBrain : MonoBehaviour {
     private void OnEnable()
     {
         nextAttackTime = 0f;
+        isInAttackPosition = false;
 
         if (projectilePool == null)
         {
@@ -74,7 +76,9 @@ public class RangedEnemyBrain : MonoBehaviour {
 
         float targetDistance = directionToTarget.magnitude;
 
-        if (targetDistance > enemyStats.PreferredDistance)
+        UpdateAttackPosition(targetDistance);
+
+        if (!isInAttackPosition)
         {
             Chase(directionToTarget);
             return;
@@ -82,6 +86,22 @@ public class RangedEnemyBrain : MonoBehaviour {
 
         animationController?.SetMovementSpeed(0f);
         TryAttack(directionToTarget);
+    }
+
+    private void UpdateAttackPosition(float targetDistance)
+    {
+        if (!isInAttackPosition &&
+            targetDistance <= enemyStats.PreferredDistance)
+        {
+            isInAttackPosition = true;
+            return;
+        }
+
+        if (isInAttackPosition &&
+            targetDistance > enemyStats.ChaseReengageDistance)
+        {
+            isInAttackPosition = false;
+        }
     }
 
     public void SetTarget(Transform newTarget)

@@ -11,6 +11,7 @@ public class RangedEnemyStats : ScriptableObject {
 
     [Header("Movement")]
     [SerializeField, Min(0f)] private float preferredDistance;
+    [SerializeField, Min(0f)] private float chaseReengageDistance;
 
     [Header("Poison Projectile")]
     [SerializeField, Min(0f)] private float projectileSpeed;
@@ -24,6 +25,7 @@ public class RangedEnemyStats : ScriptableObject {
     public float MoveSpeed => moveSpeed;
     public float Armor => armor;
     public float PreferredDistance => preferredDistance;
+    public float ChaseReengageDistance => chaseReengageDistance;
     public float ProjectileSpeed => projectileSpeed;
     public float ProjectileRange => projectileRange;
     public float PoisonDamagePerTick => poisonDamagePerTick;

@@ -1,8 +1,14 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Health))]
 public class PoisonEffect : MonoBehaviour {
+    [SerializeField] private VfxPool poisonVfxPool;
+    [SerializeField] private Transform poisonVfxPoint;
+
+    public event Action PoisonDamageApplied;
+
     private Health health;
     private Coroutine poisonRoutine;
 
@@ -31,7 +37,18 @@ public class PoisonEffect : MonoBehaviour {
 
         for (int tickIndex = 0; tickIndex < tickCount; tickIndex++)
         {
+            float healthBeforeTick = health.CurrentHealth;
             health.TakeDamage(damagePerTick, false);
+
+            if (health.CurrentHealth < healthBeforeTick)
+            {
+                Vector3 vfxPosition = poisonVfxPoint != null
+                    ? poisonVfxPoint.position
+                    : transform.position;
+
+                poisonVfxPool?.Play(vfxPosition, Quaternion.identity);
+                PoisonDamageApplied?.Invoke();
+            }
 
             if (tickIndex < tickCount - 1)
             {

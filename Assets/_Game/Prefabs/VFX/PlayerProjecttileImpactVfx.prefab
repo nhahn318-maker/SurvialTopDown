@@ -53,6 +53,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4961404218646818910}
     m_Modifications:
+    - target: {fileID: 1347780276449787774, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
+      propertyPath: clearBehavior
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 294364003325551376, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
       propertyPath: m_Materials.Array.size
       value: 1
