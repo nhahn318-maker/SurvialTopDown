@@ -6,6 +6,11 @@ public class PlayerLevelUpVfx : MonoBehaviour
     [SerializeField] private VfxPool levelUpVfxPool;
     [SerializeField] private Transform levelUpVfxPoint;
 
+    [Header("Floating Text")]
+    [SerializeField] private GameObject levelUpPopupPrefab;
+    [SerializeField] private Transform levelUpPopupPoint;
+    [SerializeField, Min(0.01f)] private float popupLifetime;
+
     private void Awake()
     {
         if (playerProgression == null || levelUpVfxPool == null)
@@ -40,5 +45,19 @@ public class PlayerLevelUpVfx : MonoBehaviour
             : transform.position;
 
         levelUpVfxPool.Play(vfxPosition, Quaternion.identity);
+
+        if (levelUpPopupPrefab == null)
+            return;
+
+        Vector3 popupPosition = levelUpPopupPoint != null
+            ? levelUpPopupPoint.position
+            : vfxPosition;
+
+        GameObject popup = Instantiate(
+            levelUpPopupPrefab,
+            popupPosition,
+            Quaternion.identity);
+
+        Destroy(popup, popupLifetime);
     }
 }
