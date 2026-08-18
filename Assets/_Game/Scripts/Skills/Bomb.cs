@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -18,6 +19,7 @@ public class Bomb : MonoBehaviour {
     private VfxPool explosionVfxPool;
     private float explosionDamage;
     private Coroutine detonationCoroutine;
+    private Action onExploded;
 
     private void Awake()
     {
@@ -36,11 +38,13 @@ public class Bomb : MonoBehaviour {
     public void Activate(
         BombPool pool,
         VfxPool vfxPool,
-        float finalDamage)
+        float finalDamage,
+        Action explosionCallback)
     {
         ownerPool = pool;
         explosionVfxPool = vfxPool;
         explosionDamage = finalDamage;
+        onExploded = explosionCallback;
 
         detonationCoroutine = StartCoroutine(DetonateAfterDelay());
     }
@@ -72,6 +76,8 @@ public class Bomb : MonoBehaviour {
         if (explosionVfxPool != null)
             explosionVfxPool.Play(transform.position, Quaternion.identity);
 
+        onExploded?.Invoke();
+        onExploded = null;
         ownerPool.Release(gameObject);
     }
 

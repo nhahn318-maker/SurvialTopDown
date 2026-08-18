@@ -12,6 +12,7 @@ public class PlayerBombSkill : MonoBehaviour {
         Mathf.Max(0f, nextAvailableTime - Time.time);
 
     public event Action BombPlaced;
+    public event Action BombExploded;
 
     private float nextAvailableTime;
 
@@ -29,9 +30,18 @@ public class PlayerBombSkill : MonoBehaviour {
             Quaternion.identity);
 
         Bomb bomb = bombObject.GetComponent<Bomb>();
-        bomb.Activate(bombPool, explosionVfxPool, finalDamage);
+        bomb.Activate(
+            bombPool,
+            explosionVfxPool,
+            finalDamage,
+            NotifyBombExploded);
         BombPlaced?.Invoke();
 
         nextAvailableTime = Time.time + bombStats.CooldownSeconds;
+    }
+
+    private void NotifyBombExploded()
+    {
+        BombExploded?.Invoke();
     }
 }

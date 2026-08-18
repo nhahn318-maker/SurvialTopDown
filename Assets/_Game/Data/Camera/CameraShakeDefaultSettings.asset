@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b5a7f1f78925547978c4642db3f001, type: 3}
-  m_Name: BasicAttackDefaultStats
+  m_Script: {fileID: 11500000, guid: 8d4c5b0e54a24034099c13f16fa68d59, type: 3}
+  m_Name: CameraShakeDefaultSettings
   m_EditorClassIdentifier: 
-  projectileBaseDamage: 1000
-  maxCharges: 3
-  chargeRecoverySeconds: 3
-  minimumFireInterval: 0.5
-  spreadAngles:
-  - -15
-  - 0
-  - 15
+  shot:
+    duration: 0.06
+    magnitude: 0.025
+  dashExplosion:
+    duration: 0.12
+    magnitude: 0.08
+  playerDamage:
+    duration: 0.08
+    magnitude: 0.05

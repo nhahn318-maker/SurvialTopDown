@@ -20,6 +20,7 @@ public class PlayerDashSkill : MonoBehaviour {
         Mathf.Max(0f, nextAvailableTime - Time.time);
 
     public event Action DashStarted;
+    public event Action DashExploded;
 
     private CharacterController characterController;
     private Collider[] overlapBuffer;
@@ -115,6 +116,8 @@ public class PlayerDashSkill : MonoBehaviour {
 
         if (dashExplosionVfxPool != null)
             dashExplosionVfxPool.Play(transform.position, Quaternion.identity);
+
+        DashExploded?.Invoke();
     }
 
 #if UNITY_EDITOR
