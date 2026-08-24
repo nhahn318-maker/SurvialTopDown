@@ -84,7 +84,7 @@ public class MeleeEnemyBrain : MonoBehaviour {
 
         Vector3 moveDirection = directionToTarget.normalized;
 
-        transform.rotation = Quaternion.LookRotation(moveDirection);
+        RotateTowards(moveDirection);
 
         characterController.Move(
             moveDirection *
@@ -99,18 +99,17 @@ public class MeleeEnemyBrain : MonoBehaviour {
         if (directionToTarget.sqrMagnitude <= Mathf.Epsilon)
             return;
 
-        Vector3 attackDirection = directionToTarget.normalized;
-
-        transform.rotation = Quaternion.LookRotation(attackDirection);
-
         float angleToTarget = Vector3.Angle(
             transform.forward,
-            attackDirection);
+            directionToTarget);
 
         float halfConeAngle = enemyStats.AttackConeAngle * 0.5f;
 
         if (angleToTarget > halfConeAngle)
+        {
+            RotateTowards(directionToTarget);
             return;
+        }
 
         IDamageable damageable =
             target.GetComponent<IDamageable>();
@@ -123,6 +122,19 @@ public class MeleeEnemyBrain : MonoBehaviour {
 
         isRecovering = true;
         recoveryEndTime = Time.time + enemyStats.RecoverySeconds;
+    }
+
+    private void RotateTowards(Vector3 direction)
+    {
+        if (direction.sqrMagnitude <= Mathf.Epsilon)
+            return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            enemyStats.TurnSpeedDegreesPerSecond * Time.deltaTime);
     }
 
 #if UNITY_EDITOR

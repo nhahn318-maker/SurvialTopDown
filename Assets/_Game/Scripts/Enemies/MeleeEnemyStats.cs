@@ -12,6 +12,9 @@ public class MeleeEnemyStats : ScriptableObject {
     [SerializeField, Min(0f)] private float recoverySeconds;
     [SerializeField, Min(0f)] private float armor;
 
+    [Header("Facing")]
+    [SerializeField, Min(0f)] private float turnSpeedDegreesPerSecond;
+
     public float MaxHealth => maxHealth;
     public float MoveSpeed => moveSpeed;
     public float AttackBaseDamage => attackBaseDamage;
@@ -19,4 +22,5 @@ public class MeleeEnemyStats : ScriptableObject {
     public float AttackRange => attackRange;
     public float RecoverySeconds => recoverySeconds;
     public float Armor => armor;
+    public float TurnSpeedDegreesPerSecond => turnSpeedDegreesPerSecond;
 }

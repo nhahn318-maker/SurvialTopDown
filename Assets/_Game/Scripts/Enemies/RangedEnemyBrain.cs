@@ -132,7 +132,7 @@ public class RangedEnemyBrain : MonoBehaviour {
 
         Vector3 moveDirection = directionToTarget.normalized;
 
-        transform.rotation = Quaternion.LookRotation(moveDirection);
+        RotateTowards(moveDirection);
 
         characterController.Move(
             moveDirection *
@@ -150,9 +150,17 @@ public class RangedEnemyBrain : MonoBehaviour {
             return;
         }
 
-        Vector3 attackDirection = directionToTarget.normalized;
+        float angleToTarget = Vector3.Angle(
+            transform.forward,
+            directionToTarget);
 
-        transform.rotation = Quaternion.LookRotation(attackDirection);
+        if (angleToTarget > enemyStats.AttackAimAngle)
+        {
+            RotateTowards(directionToTarget);
+            return;
+        }
+
+        Vector3 attackDirection = transform.forward;
 
         GameObject projectileObject = projectilePool.Get(
             projectileLaunchPoint.position,
@@ -174,6 +182,21 @@ public class RangedEnemyBrain : MonoBehaviour {
         nextAttackTime = Time.time + enemyStats.AttackCooldown;
         recoveryEndTime = nextAttackTime;
         isRecovering = true;
+    }
+
+    private void RotateTowards(Vector3 direction)
+    {
+        if (direction.sqrMagnitude <= Mathf.Epsilon)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            enemyStats.TurnSpeedDegreesPerSecond * Time.deltaTime);
     }
 
 #if UNITY_EDITOR

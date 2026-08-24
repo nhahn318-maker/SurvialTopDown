@@ -17,6 +17,8 @@ MonoBehaviour:
   armor: 0
   preferredDistance: 3
   chaseReengageDistance: 3.5
+  turnSpeedDegreesPerSecond: 180
+  attackAimAngle: 5
   projectileSpeed: 10
   projectileRange: 5
   poisonDamagePerTick: 30

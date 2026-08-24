@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2b5a7f1f78925547978c4642db3f001, type: 3}
   m_Name: BasicAttackDefaultStats
   m_EditorClassIdentifier: 
-  projectileBaseDamage: 10
+  projectileBaseDamage: 100
   maxCharges: 3
   chargeRecoverySeconds: 3
   minimumFireInterval: 0.5

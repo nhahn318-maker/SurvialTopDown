@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c1d7333aa44ea49a9fff4b028747bc, type: 3}
   m_Name: BombDefaultStats
   m_EditorClassIdentifier: 
-  baseDamage: 50
+  baseDamage: 100
   detonationDelay: 2
   explosionRadius: 5
   cooldownSeconds: 12

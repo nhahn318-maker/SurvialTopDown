@@ -16,4 +16,4 @@ MonoBehaviour:
   maxMeleeCount: 4
   minRangedCount: 1
   maxRangedCount: 2
-  spawnIntervalSeconds: 1.5
+  spawnIntervalSeconds: 0

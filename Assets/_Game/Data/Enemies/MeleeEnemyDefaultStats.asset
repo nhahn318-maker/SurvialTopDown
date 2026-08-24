@@ -19,3 +19,4 @@ MonoBehaviour:
   attackRange: 1.3
   recoverySeconds: 1
   armor: 0
+  turnSpeedDegreesPerSecond: 180
