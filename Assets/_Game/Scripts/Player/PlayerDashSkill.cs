@@ -47,13 +47,21 @@ public class PlayerDashSkill : MonoBehaviour {
 
     public void TryDash()
     {
-        if (dashCoroutine != null ||
-            Time.time < nextAvailableTime ||
-            dashStats.DashDuration <= 0f)
-        {
+        if (!CanDash())
             return;
-        }
 
+        StartDash();
+    }
+
+    private bool CanDash()
+    {
+        return dashCoroutine == null &&
+            Time.time >= nextAvailableTime &&
+            dashStats.DashDuration > 0f;
+    }
+
+    private void StartDash()
+    {
         nextAvailableTime = Time.time + dashStats.CooldownSeconds;
         DashStarted?.Invoke();
         dashCoroutine = StartCoroutine(Dash());
@@ -61,39 +69,61 @@ public class PlayerDashSkill : MonoBehaviour {
 
     private IEnumerator Dash()
     {
-        playerMovement.SetInputEnabled(false);
+        BeginDash();
 
         Vector3 dashDirection = transform.forward;
         float elapsedTime = 0f;
 
         while (elapsedTime < dashStats.DashDuration)
         {
-            float frameDuration = Mathf.Min(
-                Time.deltaTime,
-                dashStats.DashDuration - elapsedTime);
-
-            float dashStep =
-                dashStats.DashDistance *
-                (frameDuration / dashStats.DashDuration);
-
-            characterController.Move(dashDirection * dashStep);
-
-            elapsedTime += frameDuration;
+            elapsedTime += MoveDash(dashDirection, elapsedTime);
             yield return null;
         }
 
+        FinishDash();
+    }
+
+    private void BeginDash()
+    {
+        playerMovement.SetInputEnabled(false);
+    }
+
+    private float MoveDash(Vector3 dashDirection, float elapsedTime)
+    {
+        float frameDuration = Mathf.Min(
+            Time.deltaTime,
+            dashStats.DashDuration - elapsedTime);
+
+        float dashStep = dashStats.DashDistance *
+            (frameDuration / dashStats.DashDuration);
+
+        characterController.Move(dashDirection * dashStep);
+        return frameDuration;
+    }
+
+    private void FinishDash()
+    {
         playerMovement.SetInputEnabled(true);
         Explode();
-
         dashCoroutine = null;
     }
 
     private void Explode()
     {
-        float finalDamage = DamageCalculator.CalculateDamageDealt(
+        float finalDamage = CalculateExplosionDamage();
+        DamageEnemiesInRadius(finalDamage);
+        PlayExplosionFeedback();
+    }
+
+    private float CalculateExplosionDamage()
+    {
+        return DamageCalculator.CalculateDamageDealt(
             dashStats.ExplosionBaseDamage,
             playerProgression.DamageMultiplier);
+    }
 
+    private void DamageEnemiesInRadius(float damage)
+    {
         int hitCount = Physics.OverlapSphereNonAlloc(
             transform.position,
             dashStats.ExplosionRadius,
@@ -110,10 +140,13 @@ public class PlayerDashSkill : MonoBehaviour {
 
             if (damageable != null && damagedTargets.Add(damageable))
             {
-                damageable.TakeDamage(finalDamage);
+                damageable.TakeDamage(damage);
             }
         }
+    }
 
+    private void PlayExplosionFeedback()
+    {
         if (dashExplosionVfxPool != null)
             dashExplosionVfxPool.Play(transform.position, Quaternion.identity);
 

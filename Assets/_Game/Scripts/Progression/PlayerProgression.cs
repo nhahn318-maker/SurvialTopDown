@@ -49,21 +49,30 @@ public class PlayerProgression : MonoBehaviour {
 
     public void GainExperience(int amount)
     {
-
-
-        if (amount <= 0 || health == null)
-        {
+        if (!CanGainExperience(amount))
             return;
-        }
 
         CurrentExperience += amount;
+        ProcessLevelUps();
+        NotifyExperienceChanged();
+    }
 
+    private bool CanGainExperience(int amount)
+    {
+        return amount > 0 && health != null;
+    }
+
+    private void ProcessLevelUps()
+    {
         while (CurrentExperience >= progressionStats.ExperiencePerLevel)
         {
             CurrentExperience -= progressionStats.ExperiencePerLevel;
             LevelUp();
         }
+    }
 
+    private void NotifyExperienceChanged()
+    {
         ExperienceChanged?.Invoke(
             CurrentExperience,
             progressionStats.ExperiencePerLevel);

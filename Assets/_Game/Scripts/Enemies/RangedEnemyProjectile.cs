@@ -23,24 +23,34 @@ public class RangedEnemyProjectile : MonoBehaviour {
     private void FixedUpdate()
     {
         if (!isLaunched)
-        {
             return;
-        }
 
-        float moveDistance = projectileSpeed * Time.fixedDeltaTime;
-
-        projectileRigidbody.MovePosition(
-            projectileRigidbody.position + moveDirection * moveDistance);
-
-        travelledDistance += moveDistance;
-
-        if (travelledDistance >= projectileRange)
-        {
-            ReturnToPool();
-        }
+        MoveProjectile();
+        ReturnIfOutOfRange();
     }
 
     public void Launch(
+        RangedProjectilePool pool,
+        Vector3 direction,
+        float speed,
+        float range,
+        float damagePerTick,
+        int tickCount,
+        float duration)
+    {
+        InitializeLaunchData(
+            pool,
+            direction,
+            speed,
+            range,
+            damagePerTick,
+            tickCount,
+            duration);
+
+        transform.rotation = Quaternion.LookRotation(moveDirection);
+    }
+
+    private void InitializeLaunchData(
         RangedProjectilePool pool,
         Vector3 direction,
         float speed,
@@ -58,38 +68,58 @@ public class RangedEnemyProjectile : MonoBehaviour {
         poisonDuration = duration;
         travelledDistance = 0f;
         isLaunched = true;
+    }
 
-        transform.rotation = Quaternion.LookRotation(moveDirection);
+    private void MoveProjectile()
+    {
+        float moveDistance = GetMoveDistance();
+
+        projectileRigidbody.MovePosition(
+            projectileRigidbody.position + moveDirection * moveDistance);
+
+        travelledDistance += moveDistance;
+    }
+
+    private float GetMoveDistance()
+    {
+        return projectileSpeed * Time.fixedDeltaTime;
+    }
+
+    private void ReturnIfOutOfRange()
+    {
+        if (travelledDistance >= projectileRange)
+            ReturnToPool();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isLaunched)
-        {
+        if (!isLaunched || !CanHit(other))
             return;
-        }
 
+        if (TryApplyPoison(other))
+            ReturnToPool();
+    }
+
+    private bool CanHit(Collider other)
+    {
         int otherLayerMask = 1 << other.gameObject.layer;
+        return (targetLayers.value & otherLayerMask) != 0;
+    }
 
-        if ((targetLayers.value & otherLayerMask) == 0)
-        {
-            return;
-        }
-
+    private bool TryApplyPoison(Collider other)
+    {
         PoisonEffect poisonEffect =
             other.GetComponentInParent<PoisonEffect>();
 
         if (poisonEffect == null)
-        {
-            return;
-        }
+            return false;
 
         poisonEffect.Apply(
             poisonDamagePerTick,
             poisonTickCount,
             poisonDuration);
 
-        ReturnToPool();
+        return true;
     }
 
     private void ReturnToPool()

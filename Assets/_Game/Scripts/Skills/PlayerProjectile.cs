@@ -1,7 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerProjectile : MonoBehaviour {
+public class PlayerProjectile : MonoBehaviour
+{
     [SerializeField] private ProjectileStats projectileStats;
     [SerializeField] private LayerMask hitLayers;
 
@@ -25,14 +26,27 @@ public class PlayerProjectile : MonoBehaviour {
         if (!isLaunched)
             return;
 
-        float travelStep =
-            projectileStats.MoveSpeed * Time.fixedDeltaTime;
+        MoveProjectile();
+        ReleaseIfOutOfRange();
+    }
+
+    private void MoveProjectile()
+    {
+        float travelStep = GetTravelStep();
 
         projectileRigidbody.MovePosition(
             projectileRigidbody.position + direction * travelStep);
 
         travelledDistance += travelStep;
+    }
 
+    private float GetTravelStep()
+    {
+        return projectileStats.MoveSpeed * Time.fixedDeltaTime;
+    }
+
+    private void ReleaseIfOutOfRange()
+    {
         if (travelledDistance >= projectileStats.MaxTravelDistance)
         {
             ReleaseToPool();
@@ -55,23 +69,37 @@ public class PlayerProjectile : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-
-        if (!isLaunched)
+        if (!isLaunched || !CanHit(other))
             return;
 
+        if (!TryGetDamageable(other, out IDamageable damageable))
+            return;
+
+        HandleHit(other, damageable);
+    }
+
+    private bool CanHit(Collider other)
+    {
         int otherLayerMask = 1 << other.gameObject.layer;
 
-        if ((hitLayers.value & otherLayerMask) == 0)
-            return;
+        return (hitLayers.value & otherLayerMask) != 0;
+    }
 
-        IDamageable damageable =
-            other.GetComponentInParent<IDamageable>();
+    private static bool TryGetDamageable(
+        Collider other,
+        out IDamageable damageable)
+    {
+        damageable = other.GetComponentInParent<IDamageable>();
+        return damageable != null;
+    }
 
-        if (damageable == null)
-            return;
-
+    private void HandleHit(Collider other, IDamageable damageable)
+    {
         damageable.TakeDamage(damage);
-        impactVfxPool?.Play(other.ClosestPoint(transform.position), Quaternion.identity);
+        impactVfxPool?.Play(
+            other.ClosestPoint(transform.position),
+            Quaternion.identity);
+
         ReleaseToPool();
     }
 

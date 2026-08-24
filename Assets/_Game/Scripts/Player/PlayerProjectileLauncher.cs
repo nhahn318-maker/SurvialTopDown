@@ -39,14 +39,27 @@ public class PlayerProjectileLauncher : MonoBehaviour {
 
     private void LaunchProjectile(float spreadAngle)
     {
-        Vector3 direction =
-            Quaternion.AngleAxis(spreadAngle, Vector3.up) *
-            transform.forward;
+        Vector3 direction = GetLaunchDirection(spreadAngle);
+        float damage = CalculateProjectileDamage();
 
-        float finalDamage = DamageCalculator.CalculateDamageDealt(
+        LaunchFromPool(direction, damage);
+    }
+
+    private Vector3 GetLaunchDirection(float spreadAngle)
+    {
+        return Quaternion.AngleAxis(spreadAngle, Vector3.up) *
+            transform.forward;
+    }
+
+    private float CalculateProjectileDamage()
+    {
+        return DamageCalculator.CalculateDamageDealt(
             basicAttack.ProjectileBaseDamage,
             playerProgression.DamageMultiplier);
+    }
 
+    private void LaunchFromPool(Vector3 direction, float damage)
+    {
         GameObject projectileObject = projectilePool.Get(
             launchPoint.position,
             Quaternion.LookRotation(direction));
@@ -57,7 +70,7 @@ public class PlayerProjectileLauncher : MonoBehaviour {
         projectile.Launch(
             projectilePool,
             direction,
-            finalDamage,
+            damage,
             impactVfxPool);
     }
 

@@ -16,14 +16,39 @@ public class PlayerBombSkill : MonoBehaviour {
 
     private float nextAvailableTime;
 
+    private void Awake()
+    {
+        if (playerProgression == null ||
+            bombStats == null ||
+            bombPool == null ||
+            explosionVfxPool == null ||
+            bombPlacementPoint == null)
+        {
+            Debug.LogError(
+                "PlayerBombSkill requires all references.",
+                this);
+
+            enabled = false;
+        }
+    }
+
     public void TryPlaceBomb()
     {
-        if (Time.time < nextAvailableTime)
+        if (!CanPlaceBomb())
             return;
 
-        float finalDamage = DamageCalculator.CalculateDamageDealt(
-            bombStats.BaseDamage,
-            playerProgression.DamageMultiplier);
+        PlaceBomb();
+        StartCooldown();
+    }
+
+    private bool CanPlaceBomb()
+    {
+        return Time.time >= nextAvailableTime;
+    }
+
+    private void PlaceBomb()
+    {
+        float damage = CalculateBombDamage();
 
         GameObject bombObject = bombPool.Get(
             bombPlacementPoint.position,
@@ -33,10 +58,21 @@ public class PlayerBombSkill : MonoBehaviour {
         bomb.Activate(
             bombPool,
             explosionVfxPool,
-            finalDamage,
+            damage,
             NotifyBombExploded);
-        BombPlaced?.Invoke();
 
+        BombPlaced?.Invoke();
+    }
+
+    private float CalculateBombDamage()
+    {
+        return DamageCalculator.CalculateDamageDealt(
+            bombStats.BaseDamage,
+            playerProgression.DamageMultiplier);
+    }
+
+    private void StartCooldown()
+    {
         nextAvailableTime = Time.time + bombStats.CooldownSeconds;
     }
 

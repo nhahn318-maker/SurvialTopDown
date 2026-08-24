@@ -33,6 +33,11 @@ public class PlayerBasicAttack : MonoBehaviour {
 
     private void Update()
     {
+        TryRecoverCharge();
+    }
+
+    private void TryRecoverCharge()
+    {
         if (CurrentCharges >= MaxCharges)
             return;
 
@@ -51,9 +56,20 @@ public class PlayerBasicAttack : MonoBehaviour {
 
     public void TryFire()
     {
-        if (CurrentCharges <= 0 || Time.time < nextFireTime)
+        if (!CanFire())
             return;
 
+        ConsumeCharge();
+        RequestProjectiles();
+    }
+
+    private bool CanFire()
+    {
+        return CurrentCharges > 0 && Time.time >= nextFireTime;
+    }
+
+    private void ConsumeCharge()
+    {
         bool wasAtFullCharges = CurrentCharges == MaxCharges;
 
         CurrentCharges--;
@@ -67,7 +83,10 @@ public class PlayerBasicAttack : MonoBehaviour {
 
         ChargesChanged?.Invoke(CurrentCharges, MaxCharges);
         Fired?.Invoke();
+    }
 
+    private void RequestProjectiles()
+    {
         foreach (float angle in basicAttackStats.SpreadAngles)
         {
             ProjectileRequested?.Invoke(angle);

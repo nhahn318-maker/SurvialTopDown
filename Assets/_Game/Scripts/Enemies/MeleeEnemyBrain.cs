@@ -43,23 +43,14 @@ public class MeleeEnemyBrain : MonoBehaviour {
     {
         if (target == null || enemyStats == null)
         {
-            animationController?.SetMovementSpeed(0f);
+            StopMovementAnimation();
             return;
         }
 
-        if (isRecovering)
-        {
-            animationController?.SetMovementSpeed(0f);
-
-            if (Time.time >= recoveryEndTime)
-                isRecovering = false;
-
+        if (HandleRecovery())
             return;
-        }
 
-        Vector3 directionToTarget = target.position - transform.position;
-        directionToTarget.y = 0f;
-
+        Vector3 directionToTarget = GetDirectionToTarget();
         float targetDistance = directionToTarget.magnitude;
 
         if (targetDistance > enemyStats.AttackRange)
@@ -68,13 +59,33 @@ public class MeleeEnemyBrain : MonoBehaviour {
             return;
         }
 
-        animationController?.SetMovementSpeed(0f);
+        StopMovementAnimation();
         TryAttack(directionToTarget);
     }
 
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+    }
+
+    private bool HandleRecovery()
+    {
+        if (!isRecovering)
+            return false;
+
+        StopMovementAnimation();
+
+        if (Time.time >= recoveryEndTime)
+            isRecovering = false;
+
+        return true;
+    }
+
+    private Vector3 GetDirectionToTarget()
+    {
+        Vector3 directionToTarget = target.position - transform.position;
+        directionToTarget.y = 0f;
+        return directionToTarget;
     }
 
     private void Chase(Vector3 directionToTarget)
@@ -99,13 +110,7 @@ public class MeleeEnemyBrain : MonoBehaviour {
         if (directionToTarget.sqrMagnitude <= Mathf.Epsilon)
             return;
 
-        float angleToTarget = Vector3.Angle(
-            transform.forward,
-            directionToTarget);
-
-        float halfConeAngle = enemyStats.AttackConeAngle * 0.5f;
-
-        if (angleToTarget > halfConeAngle)
+        if (!IsTargetInAttackCone(directionToTarget))
         {
             RotateTowards(directionToTarget);
             return;
@@ -122,6 +127,21 @@ public class MeleeEnemyBrain : MonoBehaviour {
 
         isRecovering = true;
         recoveryEndTime = Time.time + enemyStats.RecoverySeconds;
+    }
+
+    private bool IsTargetInAttackCone(Vector3 directionToTarget)
+    {
+        float angleToTarget = Vector3.Angle(
+            transform.forward,
+            directionToTarget);
+
+        float halfConeAngle = enemyStats.AttackConeAngle * 0.5f;
+        return angleToTarget <= halfConeAngle;
+    }
+
+    private void StopMovementAnimation()
+    {
+        animationController?.SetMovementSpeed(0f);
     }
 
     private void RotateTowards(Vector3 direction)

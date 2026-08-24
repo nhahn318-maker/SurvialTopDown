@@ -71,22 +71,14 @@ public class RangedEnemyBrain : MonoBehaviour {
             enemyStats == null ||
             projectilePool == null)
         {
-            animationController?.SetMovementSpeed(0f);
+            StopMovementAnimation();
             return;
         }
 
-        if (isRecovering)
-        {
-            animationController?.SetMovementSpeed(0f);
-
-            if (Time.time >= recoveryEndTime)
-                isRecovering = false;
-
+        if (HandleRecovery())
             return;
-        }
 
-        Vector3 directionToTarget = target.position - transform.position;
-        directionToTarget.y = 0f;
+        Vector3 directionToTarget = GetDirectionToTarget();
 
         float targetDistance = directionToTarget.magnitude;
 
@@ -98,7 +90,7 @@ public class RangedEnemyBrain : MonoBehaviour {
             return;
         }
 
-        animationController?.SetMovementSpeed(0f);
+        StopMovementAnimation();
         TryAttack(directionToTarget);
     }
 
@@ -123,6 +115,26 @@ public class RangedEnemyBrain : MonoBehaviour {
         target = newTarget;
     }
 
+    private bool HandleRecovery()
+    {
+        if (!isRecovering)
+            return false;
+
+        StopMovementAnimation();
+
+        if (Time.time >= recoveryEndTime)
+            isRecovering = false;
+
+        return true;
+    }
+
+    private Vector3 GetDirectionToTarget()
+    {
+        Vector3 directionToTarget = target.position - transform.position;
+        directionToTarget.y = 0f;
+        return directionToTarget;
+    }
+
     private void Chase(Vector3 directionToTarget)
     {
         if (directionToTarget.sqrMagnitude <= Mathf.Epsilon)
@@ -144,24 +156,38 @@ public class RangedEnemyBrain : MonoBehaviour {
 
     private void TryAttack(Vector3 directionToTarget)
     {
-        if (Time.time < nextAttackTime ||
-            directionToTarget.sqrMagnitude <= Mathf.Epsilon)
-        {
+        if (!CanAttack(directionToTarget))
             return;
-        }
 
-        float angleToTarget = Vector3.Angle(
-            transform.forward,
-            directionToTarget);
-
-        if (angleToTarget > enemyStats.AttackAimAngle)
+        if (!IsTargetInAimAngle(directionToTarget))
         {
             RotateTowards(directionToTarget);
             return;
         }
 
-        Vector3 attackDirection = transform.forward;
+        LaunchProjectile();
+        animationController?.TriggerShoot();
+        StartAttackRecovery();
+    }
 
+    private bool CanAttack(Vector3 directionToTarget)
+    {
+        return Time.time >= nextAttackTime &&
+            directionToTarget.sqrMagnitude > Mathf.Epsilon;
+    }
+
+    private bool IsTargetInAimAngle(Vector3 directionToTarget)
+    {
+        float angleToTarget = Vector3.Angle(
+            transform.forward,
+            directionToTarget);
+
+        return angleToTarget <= enemyStats.AttackAimAngle;
+    }
+
+    private void LaunchProjectile()
+    {
+        Vector3 attackDirection = transform.forward;
         GameObject projectileObject = projectilePool.Get(
             projectileLaunchPoint.position,
             Quaternion.LookRotation(attackDirection));
@@ -177,11 +203,18 @@ public class RangedEnemyBrain : MonoBehaviour {
             enemyStats.PoisonDamagePerTick,
             enemyStats.PoisonTickCount,
             enemyStats.PoisonDuration);
+    }
 
-        animationController?.TriggerShoot();
+    private void StartAttackRecovery()
+    {
         nextAttackTime = Time.time + enemyStats.AttackCooldown;
         recoveryEndTime = nextAttackTime;
         isRecovering = true;
+    }
+
+    private void StopMovementAnimation()
+    {
+        animationController?.SetMovementSpeed(0f);
     }
 
     private void RotateTowards(Vector3 direction)

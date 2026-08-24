@@ -36,22 +36,11 @@ public class PoisonEffect : MonoBehaviour {
         int tickCount,
         float duration)
     {
-        float tickInterval = duration / (tickCount - 1);
+        float tickInterval = CalculateTickInterval(duration, tickCount);
 
         for (int tickIndex = 0; tickIndex < tickCount; tickIndex++)
         {
-            float healthBeforeTick = health.CurrentHealth;
-            health.TakeDamage(damagePerTick, false);
-
-            if (health.CurrentHealth < healthBeforeTick)
-            {
-                Vector3 vfxPosition = poisonVfxPoint != null
-                    ? poisonVfxPoint.position
-                    : transform.position;
-
-                poisonVfxPool?.Play(vfxPosition, Quaternion.identity);
-                PoisonDamageApplied?.Invoke();
-            }
+            ApplyPoisonTick(damagePerTick);
 
             if (tickIndex < tickCount - 1)
             {
@@ -60,6 +49,30 @@ public class PoisonEffect : MonoBehaviour {
         }
 
         poisonRoutine = null;
+    }
+
+    private float CalculateTickInterval(float duration, int tickCount)
+    {
+        return duration / (tickCount - 1);
+    }
+
+    private void ApplyPoisonTick(float damagePerTick)
+    {
+        float healthBeforeTick = health.CurrentHealth;
+        health.TakeDamage(damagePerTick, false);
+
+        if (health.CurrentHealth >= healthBeforeTick)
+            return;
+
+        poisonVfxPool?.Play(GetPoisonVfxPosition(), Quaternion.identity);
+        PoisonDamageApplied?.Invoke();
+    }
+
+    private Vector3 GetPoisonVfxPosition()
+    {
+        return poisonVfxPoint != null
+            ? poisonVfxPoint.position
+            : transform.position;
     }
 
     private void OnDisable()

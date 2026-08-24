@@ -41,11 +41,8 @@ public class WaveManager : MonoBehaviour {
             return;
         }
 
-        if (meleeEnemyPool.ActiveCount > 0 ||
-            rangedEnemyPool.ActiveCount > 0)
-        {
+        if (!AreAllEnemiesDefeated())
             return;
-        }
 
         BeginNextWave();
     }
@@ -69,22 +66,12 @@ public class WaveManager : MonoBehaviour {
 
     private System.Collections.IEnumerator SpawnNextWave()
     {
-        int meleeCount = Random.Range(
-            waveConfig.MinMeleeCount,
-            waveConfig.MaxMeleeCount + 1);
-
-        int rangedCount = Random.Range(
-            waveConfig.MinRangedCount,
-            waveConfig.MaxRangedCount + 1);
+        GetRandomEnemyCounts(out int meleeCount, out int rangedCount);
 
         int totalEnemyCount = meleeCount + rangedCount;
 
-        if (totalEnemyCount > spawnPoints.Length)
+        if (!HasEnoughSpawnPoints(totalEnemyCount))
         {
-            Debug.LogError(
-                "WaveManager requires at least one spawn point per enemy.",
-                this);
-
             hasActiveWave = false;
             spawnWaveCoroutine = null;
             yield break;
@@ -114,6 +101,37 @@ public class WaveManager : MonoBehaviour {
         }
 
         spawnWaveCoroutine = null;
+    }
+
+    private bool AreAllEnemiesDefeated()
+    {
+        return meleeEnemyPool.ActiveCount == 0 &&
+            rangedEnemyPool.ActiveCount == 0;
+    }
+
+    private void GetRandomEnemyCounts(
+        out int meleeCount,
+        out int rangedCount)
+    {
+        meleeCount = Random.Range(
+            waveConfig.MinMeleeCount,
+            waveConfig.MaxMeleeCount + 1);
+
+        rangedCount = Random.Range(
+            waveConfig.MinRangedCount,
+            waveConfig.MaxRangedCount + 1);
+    }
+
+    private bool HasEnoughSpawnPoints(int totalEnemyCount)
+    {
+        if (totalEnemyCount <= spawnPoints.Length)
+            return true;
+
+        Debug.LogError(
+            "WaveManager requires at least one spawn point per enemy.",
+            this);
+
+        return false;
     }
 
     private List<EnemyPool> CreateSpawnPlan(
